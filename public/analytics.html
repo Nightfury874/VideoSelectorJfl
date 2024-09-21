@@ -1,0 +1,92 @@
+<!-- public/analytics.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Analytics Dashboard</h1>
+        <p>Overview of Prototype Selections</p>
+    </header>
+    
+    <div class="container">
+        <div class="analytics-container">
+            <h2>Selection Summary</h2>
+            <p><strong>Total Selections:</strong> <span id="totalSelections">0</span></p>
+            <p><strong>Prototype 1 Selections:</strong> <span id="prototype1">0</span> (<span id="percentage1">0</span>%)</p>
+            <p><strong>Prototype 2 Selections:</strong> <span id="prototype2">0</span> (<span id="percentage2">0</span>%)</p>
+        </div>
+        <div class="analytics-details">
+            <p><strong>Last Updated:</strong> <span id="lastUpdated">Never</span></p>
+            <p><strong>Last Response:</strong> <span id="lastResponse">Never</span></p>
+        </div>
+    </div>
+
+    <!-- Popup Modal for Errors -->
+    <div id="analyticsErrorPopup" class="popup hidden">
+        <div class="popup-content">
+            <span id="closeAnalyticsErrorPopup" class="close-button">&times;</span>
+            <h2>Error</h2>
+            <p>There was an error fetching the analytics data. Please try again later.</p>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch analytics data from the server
+        function fetchAnalyticsData() {
+            fetch('/analytics/data')
+                .then(response => response.json())
+                .then(data => {
+                    updateAnalytics(data);
+                })
+                .catch(err => {
+                    console.error('Error fetching analytics data:', err);
+                    showAnalyticsErrorPopup();
+                });
+        }
+
+        // Function to update the analytics display
+        function updateAnalytics(data) {
+            document.getElementById('totalSelections').textContent = data.totalSelections;
+            document.getElementById('prototype1').textContent = data.prototype1;
+            document.getElementById('percentage1').textContent = data.percentage1;
+            document.getElementById('prototype2').textContent = data.prototype2;
+            document.getElementById('percentage2').textContent = data.percentage2;
+            document.getElementById('lastUpdated').textContent = formatTimestamp(data.lastUpdated);
+            document.getElementById('lastResponse').textContent = formatTimestamp(data.lastResponse);
+        }
+
+        // Function to format ISO timestamp to a readable format
+        function formatTimestamp(isoString) {
+            if (isoString === 'Never') return 'Never';
+            const date = new Date(isoString);
+            return date.toLocaleString();
+        }
+
+        // Popup functionality for analytics errors
+        function showAnalyticsErrorPopup() {
+            const popup = document.getElementById('analyticsErrorPopup');
+            popup.classList.remove('hidden');
+        }
+
+        function hideAnalyticsErrorPopup() {
+            const popup = document.getElementById('analyticsErrorPopup');
+            popup.classList.add('hidden');
+        }
+
+        // Close buttons
+        document.getElementById('closeAnalyticsErrorPopup').addEventListener('click', hideAnalyticsErrorPopup);
+
+        // Initialize fetching analytics data on page load
+        window.onload = function() {
+            fetchAnalyticsData();
+            // Fetch data every 10 seconds to keep it updated
+            setInterval(fetchAnalyticsData, 10000);
+        };
+    </script>
+</body>
+</html>

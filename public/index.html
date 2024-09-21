@@ -1,0 +1,157 @@
+<!-- public/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prototype Selection</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Your Opinion Matters</h1>
+        <p>Select the prototype you prefer by clicking the button below.</p>
+    </header>
+    
+    <div class="container">
+        <div class="video-container">
+            <div class="phone-frame">
+                <video id="video1" autoplay muted loop playsinline></video>
+            </div>
+            <button id="select1" class="select-button" disabled>Select This</button>
+        </div>
+        <div class="video-container">
+            <div class="phone-frame">
+                <video id="video2" autoplay muted loop playsinline></video>
+            </div>
+            <button id="select2" class="select-button" disabled>Select This</button>
+        </div>
+    </div>
+
+    <!-- Thank You Popup Modal -->
+    <div id="popup" class="popup hidden">
+        <div class="popup-content">
+            <span id="closePopup" class="close-button">&times;</span>
+            <h2>Thank You for Your Selection!</h2>
+            <p>Your response has been recorded.</p>
+            <p class="countdown">This popup will close in <span id="countdown">3</span> seconds.</p>
+        </div>
+    </div>
+
+    <!-- Error Popup Modal -->
+    <div id="errorPopup" class="popup hidden">
+        <div class="popup-content">
+            <span id="closeErrorPopup" class="close-button">&times;</span>
+            <h2>Videos Not Configured</h2>
+            <p>Please configure the video files in the admin page.</p>
+            <button id="goToAdmin" class="select-button">Go to Admin</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to check if video paths are configured
+        function checkVideoConfiguration() {
+            fetch('/config')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.video1 && data.video2) {
+                        // Set video sources
+                        document.getElementById('video1').src = 'video1';
+                        document.getElementById('video2').src = 'video2';
+                        // Enable buttons
+                        document.getElementById('select1').disabled = false;
+                        document.getElementById('select2').disabled = false;
+                    } else {
+                        // Show error popup and redirect to admin
+                        showErrorPopup();
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching config:', err);
+                    showErrorPopup();
+                });
+        }
+
+        // Event listeners for buttons
+        document.getElementById('select1').addEventListener('click', () => {
+            handleSelection(1);
+        });
+
+        document.getElementById('select2').addEventListener('click', () => {
+            handleSelection(2);
+        });
+
+        // Function to handle selection
+        function handleSelection(response) {
+            const currentTime = new Date().toISOString();
+            console.log(`Button ${response} Clicked at: ${currentTime}`);
+            sendSelection(response, currentTime);
+        }
+
+        // Function to send selection to server
+        function sendSelection(response, timestamp) {
+            fetch('/select', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ response, timestamp }),
+            })
+            .then(res => {
+                if (res.ok) {
+                    showPopup();
+                } else {
+                    alert('Error recording selection');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Error recording selection');
+            });
+        }
+
+        // Popup functionality
+        function showPopup() {
+            const popup = document.getElementById('popup');
+            const countdownElement = document.getElementById('countdown');
+            let countdown = 3;
+            popup.classList.remove('hidden');
+
+            const timer = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    hidePopup();
+                }
+            }, 1000);
+        }
+
+        function hidePopup() {
+            const popup = document.getElementById('popup');
+            popup.classList.add('hidden');
+        }
+
+        // Error Popup functionality
+        function showErrorPopup() {
+            const errorPopup = document.getElementById('errorPopup');
+            errorPopup.classList.remove('hidden');
+        }
+
+        function hideErrorPopup() {
+            const errorPopup = document.getElementById('errorPopup');
+            errorPopup.classList.add('hidden');
+        }
+
+        // Close buttons
+        document.getElementById('closePopup').addEventListener('click', hidePopup);
+        document.getElementById('closeErrorPopup').addEventListener('click', hideErrorPopup);
+        document.getElementById('goToAdmin').addEventListener('click', () => {
+            window.location.href = '/admin';
+        });
+
+        // Initialize on page load
+        window.onload = checkVideoConfiguration;
+    </script>
+</body>
+</html>

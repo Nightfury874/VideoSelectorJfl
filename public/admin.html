@@ -1,0 +1,193 @@
+<!-- public/admin.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Configure Videos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+        <p>Upload the video files for each prototype below.</p>
+    </header>
+    
+    <div class="container">
+        <!-- Form for Prototype 1 Video Upload -->
+        <form id="adminForm1" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="video1">Upload Video for Prototype 1:</label>
+                <input type="file" id="video1" name="video1" accept="video/*" required>
+            </div>
+            <button type="submit" class="select-button">Upload Prototype 1 Video</button>
+        </form>
+
+        <!-- Form for Prototype 2 Video Upload -->
+        <form id="adminForm2" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="video2">Upload Video for Prototype 2:</label>
+                <input type="file" id="video2" name="video2" accept="video/*" required>
+            </div>
+            <button type="submit" class="select-button">Upload Prototype 2 Video</button>
+        </form>
+    </div>
+    
+    <!-- Button to clear videos and config -->
+    <button id="clearButton" class="select-button">Clear Videos and Config</button>
+
+    <!-- Success Popup Modal -->
+    <div id="successPopup" class="popup hidden">
+        <div class="popup-content">
+            <span id="closeSuccessPopup" class="close-button">&times;</span>
+            <h2>Configuration Saved!</h2>
+            <p>The video files have been successfully uploaded.</p>
+            <button id="goToHome" class="select-button">Go to Home</button>
+        </div>
+    </div>
+
+    <!-- Error Popup Modal -->
+    <div id="adminErrorPopup" class="popup hidden">
+        <div class="popup-content">
+            <span id="closeAdminErrorPopup" class="close-button">&times;</span>
+            <h2>Error</h2>
+            <p>There was an error uploading the video files. Please try again.</p>
+        </div>
+    </div>
+
+    <!-- Clear Confirmation Popup Modal -->
+    <div id="clearConfirmationPopup" class="popup hidden">
+        <div class="popup-content">
+            <span id="closeClearConfirmationPopup" class="close-button">&times;</span>
+            <h2>Confirm Clear</h2>
+            <p>Are you sure you want to delete all videos, data, and clear the configuration?</p>
+            <div class="popup-actions">
+                <button id="cancelClear" class="select-button">Cancel</button>
+                <button id="confirmClear" class="select-button delete-button">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const adminForm1 = document.getElementById('adminForm1');
+        const adminForm2 = document.getElementById('adminForm2');
+        const clearButton = document.getElementById('clearButton');
+
+        // Handle Prototype 1 Video Upload
+        adminForm1.addEventListener('submit', (e) => {
+            e.preventDefault();
+            uploadVideo('video1');
+        });
+
+        // Handle Prototype 2 Video Upload
+        adminForm2.addEventListener('submit', (e) => {
+            e.preventDefault();
+            uploadVideo('video2');
+        });
+
+        // Function to upload video
+        function uploadVideo(videoField) {
+            const form = document.getElementById(videoField === 'video1' ? 'adminForm1' : 'adminForm2');
+            const fileInput = document.getElementById(videoField);
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a video file to upload.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append(videoField, file);
+
+            fetch('/admin/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => {
+                if (res.ok) {
+                    showSuccessPopup();
+                    // Optionally, reset the form
+                    form.reset();
+                } else {
+                    showAdminErrorPopup();
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showAdminErrorPopup();
+            });
+        }
+
+        // Popup functionality
+        function showSuccessPopup() {
+            const popup = document.getElementById('successPopup');
+            popup.classList.remove('hidden');
+        }
+
+        function hideSuccessPopup() {
+            const popup = document.getElementById('successPopup');
+            popup.classList.add('hidden');
+        }
+
+        function showAdminErrorPopup() {
+            const popup = document.getElementById('adminErrorPopup');
+            popup.classList.remove('hidden');
+        }
+
+        function hideAdminErrorPopup() {
+            const popup = document.getElementById('adminErrorPopup');
+            popup.classList.add('hidden');
+        }
+
+        // Close buttons for existing popups
+        document.getElementById('closeSuccessPopup').addEventListener('click', hideSuccessPopup);
+        document.getElementById('closeAdminErrorPopup').addEventListener('click', hideAdminErrorPopup);
+        document.getElementById('goToHome').addEventListener('click', () => {
+            window.location.href = '/';
+        });
+
+        // Handle Clear Videos and Config Button
+        clearButton.addEventListener('click', () => {
+            showClearConfirmationPopup();
+        });
+
+        // Show Clear Confirmation Popup
+        function showClearConfirmationPopup() {
+            const popup = document.getElementById('clearConfirmationPopup');
+            popup.classList.remove('hidden');
+        }
+
+        // Hide Clear Confirmation Popup
+        function hideClearConfirmationPopup() {
+            const popup = document.getElementById('clearConfirmationPopup');
+            popup.classList.add('hidden');
+        }
+
+        // Handle Close Button for Clear Confirmation Popup
+        document.getElementById('closeClearConfirmationPopup').addEventListener('click', hideClearConfirmationPopup);
+
+        // Handle Cancel Button in Clear Confirmation Popup
+        document.getElementById('cancelClear').addEventListener('click', hideClearConfirmationPopup);
+
+        // Handle Confirm Delete Button in Clear Confirmation Popup
+        document.getElementById('confirmClear').addEventListener('click', () => {
+            fetch('/admin/clear', {
+                method: 'POST'
+            })
+            .then(res => {
+                if (res.ok) {
+                    hideClearConfirmationPopup();
+                    alert('Videos and configuration have been cleared.');
+                } else {
+                    hideClearConfirmationPopup();
+                    alert('Failed to clear videos and configuration.');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                hideClearConfirmationPopup();
+                alert('Error clearing videos and configuration.');
+            });
+        });
+    </script>
+</body>
+</html>

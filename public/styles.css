@@ -1,0 +1,337 @@
+/* public/styles.css */
+
+/* 1. Reset some default browser styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* 3. Style the body to use Flexbox layout */
+body {
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    background-color: #f0f4f8;
+
+    color: #333;
+
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    padding: 20px;
+
+}
+/* 4. Style the header */
+header {
+
+    text-align: center;
+
+    margin-bottom: 30px;
+
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+header p {
+    font-size: 1.1em;
+    color: #7f8c8d;
+}
+
+/* 5. Style the main container to fill remaining space */
+.container {
+
+    display: flex;
+
+    gap: 40px;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    align-items: center;
+
+    width: 100%;
+
+    max-width: 1200px;
+
+}
+
+/* 6. Style video and form containers to be flexible */
+.video-container, .form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px); /* Adds a frosted glass effect */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 65%; /* Make containers take full height */
+    flex: 1 1 0; /* Allow equal flexing */
+    max-width: 32%; /* Each container takes up to 50% of the width */
+    overflow: hidden; /* Prevent content overflow */
+}
+
+/* 7. Add hover effects */
+.video-container:hover, .form-container:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* 8. Style the phone frame to maintain a portrait aspect ratio */
+.phone-frame {
+    position: relative;
+    width: 100%;
+    padding-top: 177.78%; /* 9:16 Aspect Ratio for portrait videos */
+    background: rgba(0, 0, 0, 0.1); /* Placeholder for phone frame */
+    border-radius: 30px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.phone-frame::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 30px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 9. Ensure video fills the phone frame */
+video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the entire frame without distortion */
+}
+
+/* 10. Style the select buttons */
+.select-button {
+    margin-top: 15px;
+    padding: 12px 30px;
+    background-color: #3498db;
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.select-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.select-button:hover:not(:disabled) {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+.select-button:active:not(:disabled) {
+    background-color: #1c5980;
+}
+
+/* 11. Responsive adjustments for smaller screens */
+@media (max-width: 1000px) {
+    .container {
+        flex-direction: column; /* Stack containers vertically */
+        align-items: center;
+
+    }
+
+    .video-container, .form-container {
+        width: 80%; /* Increase width for better visibility */
+        max-width: 500px;
+        height: auto; /* Adjust height based on content */
+    }
+
+    .phone-frame {
+        padding-top: 177.78%; /* Maintain portrait aspect ratio */
+    }
+}
+
+/* 12. Style Popup Modals */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup.hidden {
+    display: none;
+}
+
+.popup-content {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease;
+}
+
+.popup-content h2 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.popup-content p {
+    font-size: 1em;
+    color: #555555;
+}
+
+.popup-content .countdown {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #888888;
+}
+
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.5em;
+    color: #aaaaaa;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-button:hover {
+    color: #555555;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* 13. Additional Styles for Admin Forms */
+form {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 14. Styles for Analytics Page */
+
+.analytics-container, .analytics-details {
+
+    background: rgba(255, 255, 255, 0.2);
+
+    padding: 20px;
+
+    border-radius: 20px;
+
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+
+    backdrop-filter: blur(10px);
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    width: 100%;
+
+    max-width: 500px;
+
+    margin-bottom: 20px;
+
+}
+
+
+
+.analytics-container h2 {
+
+    margin-bottom: 20px;
+
+    color: #2c3e50;
+
+}
+
+
+
+.analytics-container p {
+
+    font-size: 1.2em;
+
+    margin-bottom: 10px;
+
+}
+
+
+
+.analytics-details p {
+
+    font-size: 1em;
+
+    color: #555555;
+
+}
+
+/* 15. Styles for Clear Confirmation Popup */
+.popup-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.popup-actions .select-button {
+    width: 45%;
+}
+
+.popup-actions .delete-button {
+    background-color: #e74c3c;
+}
+
+.popup-actions .delete-button:hover:not(:disabled) {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+.popup-actions .delete-button:active:not(:disabled) {
+    background-color: #992d22;
+}
