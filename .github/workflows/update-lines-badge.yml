@@ -22,9 +22,18 @@ jobs:
         with:
           node-version: '16' # You can specify a different LTS version if needed
 
+      - name: Initialize npm
+        run: |
+          npm init -y
+
       - name: Install Dependencies
         run: |
           npm install badge-maker@3.0.0
+
+      - name: Verify Installed Packages
+        run: |
+          npm list badge-maker
+          npm list camelcase
 
       - name: Display Node.js Version
         run: |
