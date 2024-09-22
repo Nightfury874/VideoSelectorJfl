@@ -24,7 +24,15 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          npm install badge-maker
+          npm install badge-maker@3.0.0
+
+      - name: Display Node.js Version
+        run: |
+          node -v
+
+      - name: Display badge-maker Version
+        run: |
+          npm list badge-maker
 
       - name: Count Lines and Generate Badge
         run: |
@@ -47,8 +55,8 @@ jobs:
 
           # Create a Node.js script to generate the badge with the correct TOTAL_LINES value
           cat <<EOF > generate_badge.js
-          const { BadgeFactory } = require('badge-maker');
-          const bf = new BadgeFactory();
+          const badgeMaker = require('badge-maker');
+          const bf = new badgeMaker.BadgeFactory();
 
           const format = {
             label: 'Lines',
