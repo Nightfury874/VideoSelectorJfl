@@ -42,4 +42,3 @@ jobs:
         file_pattern: cloc-badge.svg
         branch: ${{ github.ref_name }}
         token: ${{ secrets.GITHUB_TOKEN }}
-s
